@@ -14,6 +14,7 @@ DEFAULT_IMAGES = "none"
 DEFAULT_INDEX_TITLE = "EPUB Library"
 DEFAULT_NODE_NAME = "EPUB Library"
 DEFAULT_DESCRIPTION = "Public bookshelf. No login required."
+DEFAULT_ANNOUNCE_AT_START = True
 DEBOUNCE_SECONDS = 2.0
 DEFAULT_CONFIG_NAME = "nomadnet-epub.toml"
 
@@ -22,10 +23,12 @@ SAMPLE_CONFIG = """\
 # index_title: heading on index.mu
 # node_name: NomadNet announce / network display name
 # description: tagline under the heading on index.mu
+# announce_at_start: announce on NomadNet start (default true)
 
 index_title = "EPUB Library"
 description = "Public bookshelf. No login required."
 node_name = "EPUB Library"
+announce_at_start = true
 
 epubs = "./epubs"
 data_dir = "./data/nomadnetwork"
@@ -43,7 +46,7 @@ destination = file
 [client]
 enable_client = yes
 user_interface = text
-announce_at_start = yes
+announce_at_start = {announce_at_start}
 announce_interval = 360
 try_propagation_on_send_fail = yes
 periodic_lxmf_sync = yes
@@ -59,7 +62,7 @@ colormode = 256
 enable_node = yes
 node_name = {node_name}
 announce_interval = 360
-announce_at_start = Yes
+announce_at_start = {announce_at_start}
 disable_propagation = Yes
 """
 
@@ -81,6 +84,7 @@ class Settings:
     index_title: str = DEFAULT_INDEX_TITLE
     node_name: str = DEFAULT_NODE_NAME
     description: str = DEFAULT_DESCRIPTION
+    announce_at_start: bool = DEFAULT_ANNOUNCE_AT_START
     config_path: Path | None = None
 
     @property
@@ -156,6 +160,12 @@ def settings_from_file(path: Path, *, cwd: Path | None = None) -> Settings:
     index_title = str(data.get("index_title", legacy_title))
     node_name = str(data.get("node_name", DEFAULT_NODE_NAME))
 
+    announce_at_start = data.get("announce_at_start", DEFAULT_ANNOUNCE_AT_START)
+    if not isinstance(announce_at_start, bool):
+        raise ValueError(
+            f"config announce_at_start must be a boolean, got {announce_at_start!r}"
+        )
+
     return Settings(
         epubs_dir=resolve("epubs", str(cwd / "epubs")),
         data_dir=resolve("data_dir", str(cwd / "data" / "nomadnetwork")),
@@ -164,6 +174,7 @@ def settings_from_file(path: Path, *, cwd: Path | None = None) -> Settings:
         index_title=index_title,
         node_name=node_name,
         description=str(data.get("description", DEFAULT_DESCRIPTION)),
+        announce_at_start=announce_at_start,
         config_path=path.resolve(),
     )
 
@@ -184,6 +195,10 @@ def ensure_dirs(settings: Settings) -> None:
     settings.books_files_dir.mkdir(parents=True, exist_ok=True)
 
 
+def _yes_no(value: bool) -> str:
+    return "Yes" if value else "No"
+
+
 def _sync_node_name(config_text: str, node_name: str) -> str:
     import re
 
@@ -202,16 +217,33 @@ def _sync_node_name(config_text: str, node_name: str) -> str:
     return config_text
 
 
+def _sync_announce_at_start(config_text: str, announce_at_start: bool) -> str:
+    import re
+
+    value = _yes_no(announce_at_start)
+    if re.search(r"(?m)^announce_at_start\s*=", config_text):
+        return re.sub(
+            r"(?m)^announce_at_start\s*=\s*.*$",
+            f"announce_at_start = {value}",
+            config_text,
+        )
+    return config_text
+
+
 def ensure_nomad_config(settings: Settings) -> Path:
-    """Create/sync NomadNet runtime config from nomadnet-epub.toml node_name."""
+    """Create/sync NomadNet runtime config from nomadnet-epub.toml settings."""
     config_path = settings.nomad_config_dir / "config"
     settings.nomad_config_dir.mkdir(parents=True, exist_ok=True)
     (settings.nomad_config_dir / "storage" / "pages").mkdir(parents=True, exist_ok=True)
     (settings.nomad_config_dir / "storage" / "files").mkdir(parents=True, exist_ok=True)
     quoted = _quote_config_value(settings.node_name)
+    announce = _yes_no(settings.announce_at_start)
     if not config_path.exists():
         config_path.write_text(
-            MINIMAL_NOMADNET_CONFIG.format(node_name=quoted),
+            MINIMAL_NOMADNET_CONFIG.format(
+                node_name=quoted,
+                announce_at_start=announce,
+            ),
             encoding="utf-8",
         )
     else:
@@ -219,5 +251,6 @@ def ensure_nomad_config(settings: Settings) -> Path:
         if "user_interface" in text and "[textui]" not in text:
             text = text.rstrip() + TEXTUI_SECTION
         text = _sync_node_name(text, settings.node_name)
+        text = _sync_announce_at_start(text, settings.announce_at_start)
         config_path.write_text(text, encoding="utf-8")
     return settings.nomad_config_dir

@@ -1,8 +1,9 @@
 # Copy to nomadnet-epub.toml and edit.
 
 index_title = "EPUB Library"
-description = "Public bookshelf. No login required."
+description = "A Reticulum EPUB reader"
 node_name = "EPUB Library"
+announce_at_start = true
 
 epubs = "./epubs"
 data_dir = "./data/nomadnetwork"

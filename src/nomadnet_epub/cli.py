@@ -75,6 +75,8 @@ def _build_settings(args: argparse.Namespace) -> Settings:
         overrides["node_name"] = args.node_name
     if getattr(args, "description_set", False):
         overrides["description"] = args.description
+    if getattr(args, "announce_at_start_set", False):
+        overrides["announce_at_start"] = args.announce_at_start
 
     if not config_path.exists():
         if "epubs_dir" not in overrides and os.environ.get("NOMADNET_EPUB_DIR"):
@@ -97,6 +99,23 @@ class _StoreAndMark(argparse.Action):
         setattr(namespace, f"{self.dest}_set", True)
 
 
+class _StoreConstAndMark(argparse.Action):
+    def __init__(self, option_strings, dest, const, default=None, required=False, help=None):
+        super().__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=0,
+            const=const,
+            default=default,
+            required=required,
+            help=help,
+        )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, self.const)
+        setattr(namespace, f"{self.dest}_set", True)
+
+
 def _add_shared_flags(parser: argparse.ArgumentParser) -> None:
     parser.set_defaults(
         epubs_set=False,
@@ -106,6 +125,7 @@ def _add_shared_flags(parser: argparse.ArgumentParser) -> None:
         index_title_set=False,
         node_name_set=False,
         description_set=False,
+        announce_at_start_set=False,
     )
     parser.add_argument(
         "--config",
@@ -158,6 +178,20 @@ def _add_shared_flags(parser: argparse.ArgumentParser) -> None:
         default=DEFAULT_DESCRIPTION,
         action=_StoreAndMark,
         help="Tagline under the heading on index.mu",
+    )
+    parser.add_argument(
+        "--announce-on-start",
+        dest="announce_at_start",
+        action=_StoreConstAndMark,
+        const=True,
+        help="Announce on NomadNet start (default: from config, else yes)",
+    )
+    parser.add_argument(
+        "--no-announce-on-start",
+        dest="announce_at_start",
+        action=_StoreConstAndMark,
+        const=False,
+        help="Do not announce on NomadNet start",
     )
     parser.add_argument(
         "--init-config",

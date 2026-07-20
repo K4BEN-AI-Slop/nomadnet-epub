@@ -2,6 +2,8 @@
 
 Drop EPUBs in a folder; serve them as public NomadNet Micron pages.
 
+![NomadNet EPUB in MeshChat](screenshot.png)
+
 ## Install
 
 ```bash
