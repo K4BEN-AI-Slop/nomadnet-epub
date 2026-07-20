@@ -1,0 +1,28 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+
+# Local instance — keep working here; these stay out of git
+data/
+nomadnet-epub.toml
+epubs/*.epub
+epubs/**/*.epub
+!epubs/.gitkeep
+
+# Env / OS
+.env
+.env.*
+.DS_Store
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,10 @@
+# Copy to nomadnet-epub.toml and edit.
+
+index_title = "EPUB Library"
+description = "Public bookshelf. No login required."
+node_name = "EPUB Library"
+
+epubs = "./epubs"
+data_dir = "./data/nomadnetwork"
+words = 350
+images = "none"   # or "files"

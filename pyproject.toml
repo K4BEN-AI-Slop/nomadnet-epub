@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomadnet-epub"
+version = "0.3.0"
+description = "Serve an EPUB library as public NomadNet Micron pages"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["nomadnet", "reticulum", "epub", "micron", "ebook"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications",
+    "Topic :: Internet",
+]
+dependencies = [
+    "ebooklib>=0.18",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "watchdog>=4.0",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+serve = ["nomadnet>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/K4BEN-AI-Slop/nomadnet-epub"
+Repository = "https://github.com/K4BEN-AI-Slop/nomadnet-epub"
+Issues = "https://github.com/K4BEN-AI-Slop/nomadnet-epub/issues"
+
+[project.scripts]
+nomadnet-epub = "nomadnet_epub.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
