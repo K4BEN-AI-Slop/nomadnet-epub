@@ -15,6 +15,7 @@ DEFAULT_INDEX_TITLE = "EPUB Library"
 DEFAULT_NODE_NAME = "EPUB Library"
 DEFAULT_DESCRIPTION = "Public bookshelf. No login required."
 DEFAULT_ANNOUNCE_AT_START = True
+DEFAULT_CREDITS = True
 DEBOUNCE_SECONDS = 2.0
 DEFAULT_CONFIG_NAME = "nomadnet-epub.toml"
 
@@ -24,11 +25,13 @@ SAMPLE_CONFIG = """\
 # node_name: NomadNet announce / network display name
 # description: tagline under the heading on index.mu
 # announce_at_start: announce on NomadNet start (default true)
+# credits: show Host your own / GitHub footer on index.mu (default true)
 
 index_title = "EPUB Library"
 description = "Public bookshelf. No login required."
 node_name = "EPUB Library"
 announce_at_start = true
+credits = true
 
 epubs = "./epubs"
 data_dir = "./data/nomadnetwork"
@@ -85,6 +88,7 @@ class Settings:
     node_name: str = DEFAULT_NODE_NAME
     description: str = DEFAULT_DESCRIPTION
     announce_at_start: bool = DEFAULT_ANNOUNCE_AT_START
+    credits: bool = DEFAULT_CREDITS
     config_path: Path | None = None
 
     @property
@@ -166,6 +170,10 @@ def settings_from_file(path: Path, *, cwd: Path | None = None) -> Settings:
             f"config announce_at_start must be a boolean, got {announce_at_start!r}"
         )
 
+    credits = data.get("credits", DEFAULT_CREDITS)
+    if not isinstance(credits, bool):
+        raise ValueError(f"config credits must be a boolean, got {credits!r}")
+
     return Settings(
         epubs_dir=resolve("epubs", str(cwd / "epubs")),
         data_dir=resolve("data_dir", str(cwd / "data" / "nomadnetwork")),
@@ -175,6 +183,7 @@ def settings_from_file(path: Path, *, cwd: Path | None = None) -> Settings:
         node_name=node_name,
         description=str(data.get("description", DEFAULT_DESCRIPTION)),
         announce_at_start=announce_at_start,
+        credits=credits,
         config_path=path.resolve(),
     )
 

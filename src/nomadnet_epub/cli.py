@@ -77,6 +77,8 @@ def _build_settings(args: argparse.Namespace) -> Settings:
         overrides["description"] = args.description
     if getattr(args, "announce_at_start_set", False):
         overrides["announce_at_start"] = args.announce_at_start
+    if getattr(args, "credits_set", False):
+        overrides["credits"] = args.credits
 
     if not config_path.exists():
         if "epubs_dir" not in overrides and os.environ.get("NOMADNET_EPUB_DIR"):
@@ -126,6 +128,7 @@ def _add_shared_flags(parser: argparse.ArgumentParser) -> None:
         node_name_set=False,
         description_set=False,
         announce_at_start_set=False,
+        credits_set=False,
     )
     parser.add_argument(
         "--config",
@@ -192,6 +195,20 @@ def _add_shared_flags(parser: argparse.ArgumentParser) -> None:
         action=_StoreConstAndMark,
         const=False,
         help="Do not announce on NomadNet start",
+    )
+    parser.add_argument(
+        "--credits",
+        dest="credits",
+        action=_StoreConstAndMark,
+        const=True,
+        help="Show Host your own / GitHub footer on index.mu (default: from config, else yes)",
+    )
+    parser.add_argument(
+        "--no-credits",
+        dest="credits",
+        action=_StoreConstAndMark,
+        const=False,
+        help="Hide Host your own / GitHub footer on index.mu",
     )
     parser.add_argument(
         "--init-config",

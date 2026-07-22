@@ -64,8 +64,14 @@ def escape_micron_inline(text: str) -> str:
 
 
 def link(label: str, path: str, *, underline: bool = True) -> str:
-    """Micron link: `[label`url] — optional underline for visibility."""
+    """Micron link: `[label`url] — optional underline for visibility.
+
+    NomadNet browser requires same-node paths as `:/page/...` (leading colon).
+    MeshChatX also accepts `/page/...`; we emit the colon form for both.
+    """
     label = escape_micron_plain(label).replace("`", "'").replace("]", "")
+    if path.startswith("/") and not path.startswith("//"):
+        path = f":{path}"
     core = f"`[{label}`{path}]"
     if underline:
         return f"`_{core}`_"

@@ -92,6 +92,18 @@ def write_root_index(settings: Settings, books: list[BookMeta]) -> Path:
             )
             lines.append("")
 
+    if settings.credits:
+        lines.extend(
+            [
+                "",
+                ">>Host your own",
+                "",
+                "`!GitHub:`! github.com/K4BEN-AI-Slop/nomadnet-epub",
+                "",
+                "`B444pip install nomadnet-epub`b",
+            ]
+        )
+
     out = settings.pages_dir / "index.mu"
     out.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return out

@@ -46,6 +46,7 @@ Everything lives in **`nomadnet-epub.toml`** (see `nomadnet-epub.toml.example`):
 index_title = "Ben's Library"      # heading on index.mu
 description = "Mesh EPUB reader"   # tagline under the heading
 node_name = "bens-epub-library"    # NomadNet announce name
+credits = true                     # Host your own footer on index.mu
 
 epubs = "./epubs"
 data_dir = "./data/nomadnetwork"
@@ -58,6 +59,7 @@ images = "none"   # or "files"
 | `index_title` | Rendered as the `>` heading on `index.mu` |
 | `description` | Text under the heading on `index.mu` |
 | `node_name` | NomadNet network announce name (synced into `data_dir/config` on `serve`) |
+| `credits` | Show GitHub / `pip install` footer on `index.mu` (default `true`) |
 | `epubs` | Folder to watch for `.epub` files |
 | `data_dir` | NomadNet pages/files/state (not your main `~/.nomadnetwork`) |
 | `words` | Approx. words per reader page |

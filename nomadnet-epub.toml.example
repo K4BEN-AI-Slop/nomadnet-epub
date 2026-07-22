@@ -4,6 +4,7 @@ index_title = "EPUB Library"
 description = "A Reticulum EPUB reader"
 node_name = "EPUB Library"
 announce_at_start = true
+credits = true
 
 epubs = "./epubs"
 data_dir = "./data/nomadnetwork"
