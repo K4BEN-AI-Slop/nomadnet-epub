@@ -16,9 +16,10 @@ epubs/*.epub
 epubs/**/*.epub
 !epubs/.gitkeep
 
-# Env / OS
+# Env / OS / secrets
 .env
 .env.*
+.pypirc
 .DS_Store
 *.log
 
